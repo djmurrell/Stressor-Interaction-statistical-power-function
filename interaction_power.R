@@ -1,5 +1,5 @@
 #The package multiplestressR is required to run this code
-#Code written by David John Murrell
+#Code written by David John Murrell is written for clarity rather than speed or efficiency
 
 #To install run the next line
 #install.packages('mulitplestressR')
@@ -13,6 +13,8 @@ library(multiplestressR)
 # Subscripts 
 #			C: control, A: stressor A only,
 #			B: stressor B only, I: interaction treatment
+#
+# The above parameters all need parameters. Those below give user options.
 #
 # alpha is the statistical level, defaulted to 0.05
 #
