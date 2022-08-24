@@ -1,11 +1,14 @@
-#The package multiplestressR is required to run this code
+
 #Code written by David John Murrell is written for clarity rather than speed or efficiency
 
+#The function requires the library multiplestressR
 #To install run the next line
+
 #install.packages('mulitplestressR')
 
-library(multiplestressR)
+#library(multiplestressR)
 
+#######################################################################################################################
 # This function takes input values for 
 #			treatment means X_C, X_A, X_B, X_I
 #			treatment standard deviations S_C, S_A, S_B, S_I
@@ -23,9 +26,9 @@ library(multiplestressR)
 # model: set to "A" for additive null model, "M" for multiplicative null model
 # default option is additive 
 #
-# Output is a dataframe that gives the power (% of simulations that reject the null model predicted interaction)
-# and the mean effect size, averaged across all simulations
-
+# Output is a dataframe that gives the (1) power (% of simulations that reject the null model predicted interaction);
+# (2) the mean effect size, averaged across all simulations; (3) the mean effect size of 'experiments' that reject the null model
+#######################################################################################################################
 
 interaction_power = function(	X_C, X_A, X_B, X_I, 
 								S_C, S_A, S_B, S_I, 
@@ -34,12 +37,21 @@ interaction_power = function(	X_C, X_A, X_B, X_I,
 								sims=1000, model="A")
 {
 
+#Compute the expected response only if additive model selected
+if(model == "A")
+	{
+	exp_r <- X_A + X_B - X_C
+	cat("Expected interaction treatment: ", exp_r)
+	}
+
+
 sim_data<-matrix(ncol=12, nrow=sims)
 
+#We now sample observations from Gaussian distributions set by our parameters
 for(i in 1:sims)
 	{
-#We now sample observations from Gaussian distributions set by our parameters
-	
+
+#We now sample observations from Gaussian distributions set by our parameters	
 	C <- rnorm(N_C, mean=X_C, sd=S_C)
 	A <- rnorm(N_A, mean=X_A, sd=S_A)
 	B <- rnorm(N_B, mean=X_B, sd=S_B)
@@ -63,8 +75,7 @@ for(i in 1:sims)
 	sim_data[i,12] <-N_I	
 	}
 	
- #Estimate effect sizes using the additive or multiplicative null models... 
- 
+#Run the additive null model	
 	if(model == "A")
 		{
 		df_model <- effect_size_additive(	Control_N = sim_data[,3],
@@ -82,6 +93,8 @@ for(i in 1:sims)
 										StressorsAB_N = sim_data[,12],
 										StressorsAB_SD = sim_data[,11],
 										StressorsAB_Mean = sim_data[,10],
+										
+										Small_Sample_Correction = TRUE,
 							
 										Significance_Level = 0.05)
 										
@@ -91,6 +104,8 @@ for(i in 1:sims)
 		}
 	else if(model == "M")
 		{
+			
+#Run the multiplicative null model			
 		df_model <- effect_size_multiplicative(	Control_N = sim_data[,3],
 										Control_SD = sim_data[,2],
 										Control_Mean = sim_data[,1],
@@ -112,7 +127,7 @@ for(i in 1:sims)
 		df1 <- classify_interactions(	effect_size_dataframe = df_model,
 										assign_reversals = TRUE,
 										remove_directionality = TRUE)	
-			
+	
 		}
 	
 	
@@ -122,11 +137,19 @@ mean_ES<-mean(df1$Interaction_Effect_Size)
 
 #We also sum the number of times the null model was rejected
 pp <- subset(df1, df1$Interaction_Classification != "Null")
+
+#Compute average effect size for non-null cases
+significant<-mean(pp$Interaction_Effect_Size)
+
+#Compute proportion of trials where null is rejected
 pp <- length(pp$Interaction_Classification )/sims
 
-#Output is power and mean effect size
-res<-data.frame(power=pp, mean_effect_size=mean_ES)
-
+res<-data.frame(power=pp, mean_effect_size=mean_ES, detected_ES=significant)
 return(res)
+
+#These alternative outputs might be useful
+#return(df1)
+#return(mean(df_add$Interaction_Effect_Size))
+	
 	
 }
