@@ -1,6 +1,9 @@
+# This code is used to generate figure S1 in Burgess, B.J., Jackson, M.C. and Murrell, D.J., 2022. Are experiment sample sizes adequate to detect biologically important interactions between multiple stressors?. Ecology and Evolution (accepted)
 
-#Set Working Directory
-setwd("/Users/david/Dropbox (UCL)/Ben Burgess/Manuscript2/bee_data")
+#The bee data is freely available frpm Siviter, H., Bailes, E. J., Martin, C. D., Oliver, T. R., Koricheva, J., Leadbeater, E., and Brown, M. J. 2021. 662 Agrochemicals interact synergistically to increase bee mortality. Nature, 596(7872), 389-392.
+
+#Set Working Directory -needs to be set to where you have saved the bee data
+#setwd("")
 
 #Load in multiplestressR 
 library(multiplestressR)
